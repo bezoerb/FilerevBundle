@@ -7,7 +7,7 @@ The only thing you need is the rev summary provided by [`gulp-rev`](https://gith
 
 ## Installation
 #### Step 1: Download
- to come
+more to come
 
 #### Step 2: Enable the bundle
 Finally, enable the bundle in the kernel:
@@ -32,7 +32,7 @@ Add the following configuration to your `app/config/config.yml`:
 
 ## Options
 
-to come
+more to come
 
 ## Changelog
 
