@@ -40,7 +40,7 @@ See [Changelog.md](Changelog.md)
 
 ## Can I contribute?
 
-Of course. We appreciate all of our [contributors](https://github.com/addyosmani/critical/graphs/contributors) and
+Of course. We appreciate all of our [contributors](https://github.com/bezoerb/FilerevBundle/graphs/contributors) and
 welcome contributions to improve the project further. If you're uncertain whether an addition should be made, feel
 free to open up an issue and we can discuss it.
 
