@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * Copyright (c) 2015 Ben Zörb
+ * Licensed under the MIT license.
+ * http://bezoerb.mit-license.org/
+ */
+
 namespace Zoerb\Bundle\FilerevBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 

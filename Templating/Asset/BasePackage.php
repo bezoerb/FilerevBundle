@@ -6,7 +6,6 @@
  * http://bezoerb.mit-license.org/
  */
 
-
 namespace Zoerb\Bundle\FilerevBundle\Templating\Asset;
 
 use Symfony\Component\Config\ConfigCache;

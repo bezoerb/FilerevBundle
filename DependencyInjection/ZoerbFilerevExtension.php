@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Copyright (c) 2015 Ben Zörb
+ * Licensed under the MIT license.
+ * http://bezoerb.mit-license.org/
+ */
+
 namespace Zoerb\Bundle\FilerevBundle\DependencyInjection;
 
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration as FrameworkConfiguration;
