@@ -1,11 +1,11 @@
 services:
   zoerb_filerev.templating.asset.path_package:
-    public: false
+    abstract: true
     class: Zoerb\Bundle\FilerevBundle\Templating\Asset\PathPackage
-    arguments: [@request,"","","",""]
+    arguments: [@request,"","","","",""]
     scope: request
 
   zoerb_filerev.templating.asset.url_package:
-    public: false
+    abstract: true
     class: Zoerb\Bundle\FilerevBundle\Templating\Asset\UrlPackage
-    arguments: ["","","","",""]
+    arguments: ["","","","","",""]

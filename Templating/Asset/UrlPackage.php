@@ -9,7 +9,6 @@
 
 namespace Zoerb\Bundle\FilerevBundle\Templating\Asset;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Config\FileLocator;
 
 /**
@@ -33,11 +32,12 @@ class UrlPackage extends BasePackage
      * @param string       $rootDir     The asset root directory
      * @param string       $summaryFile Grunt filerev summary file
      * @param string       $cacheDir    Kernel cache dir
+     * @param string       $length      The number of characters of the hash which the file is prefixed with
      * @param string       $debug       Debug?
      */
-    public function __construct($baseUrls = array(), $rootDir, $summaryFile, $cacheDir, $debug)
+    public function __construct($baseUrls = array(), $rootDir, $summaryFile, $cacheDir, $length, $debug)
     {
-        parent::__construct($rootDir, $summaryFile, $cacheDir, $debug);
+        parent::__construct($rootDir, $summaryFile, $cacheDir, $length, $debug);
 
         if (!is_array($baseUrls)) {
             $baseUrls = (array)$baseUrls;
@@ -67,8 +67,8 @@ class UrlPackage extends BasePackage
 
         $reved = $this->getRevedFilename($file);
 
-        $fullpath = $this->rootDir . $file;
-        $fullreved = $this->rootDir . $reved;
+        $fullpath = $this->rootDir.$file;
+        $fullreved = $this->rootDir.$reved;
 
         // $reved or unversioned
         if (file_exists($fullreved)) {
@@ -80,7 +80,7 @@ class UrlPackage extends BasePackage
             $regex = preg_replace('/\.([^\.]+$)/', '\.[\d\w]{8}\.$1', $fullpath);
             $base = str_replace($path, '', $fullpath);
             foreach (glob($pattern) as $filepath) {
-                if (preg_match('#' . $regex . '#', $filepath)) {
+                if (preg_match('#'.$regex.'#', $filepath)) {
                     $result = str_replace($base, '', $filepath);
                     $this->summary->set($file, $result);
 
@@ -128,7 +128,7 @@ class UrlPackage extends BasePackage
                 return $this->baseUrls[0];
 
             default:
-                return $this->baseUrls[fmod(hexdec(substr(hash('sha256', $path), 0, 10)), $count)];
+                return $this->baseUrls[(int) fmod(hexdec(substr(hash('sha256', $path), 0, 10)), $count)];
         }
     }
 }

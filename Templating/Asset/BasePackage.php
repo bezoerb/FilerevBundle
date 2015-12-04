@@ -43,6 +43,13 @@ class BasePackage extends Package
      */
     protected $rootDir;
 
+    /**
+     * The number of characters of the hash which the file is prefixed with
+     *
+     * @var string
+     */
+    protected $length;
+
 
     /**
      * Constructor.
@@ -50,20 +57,21 @@ class BasePackage extends Package
      * @param string $rootDir     The asset root directory
      * @param string $summaryFile Grunt filerev summary file
      * @param string $cacheDir    Kernel cache dir
+     * @param string $length      The number of characters of the hash which the file is prefixed with
      * @param bool   $debug       Debug
      */
-    public function __construct($rootDir, $summaryFile, $cacheDir, $debug)
+    public function __construct($rootDir, $summaryFile, $cacheDir, $length, $debug)
     {
         parent::__construct();
 
         $this->rootDir = $rootDir;
         $this->summaryFile = $summaryFile;
         $this->cacheDir = $cacheDir;
+        $this->$length = $length;
         $this->debug = $debug;
 
         $this->initializeCacheCatalogue();
     }
-
 
 
     /**
@@ -75,7 +83,7 @@ class BasePackage extends Package
     protected function getSummary()
     {
         if (!$this->summary instanceof MessageCatalogue) {
-            throw new \Exception('Summary is not injected into ' . get_class($this));
+            throw new \Exception('Summary is not injected into '.get_class($this));
         }
 
         return $this->summary;
@@ -106,7 +114,7 @@ class BasePackage extends Package
         // use empty cataloge if file does not exist
         $locator = new FileLocator(array(
             dirname($summaryFile),
-            __DIR__ . '/../../Resources/config',
+            __DIR__.'/../../Resources/config',
         ));
         try {
             $resources = $locator->locate(basename($summaryFile), null, false);

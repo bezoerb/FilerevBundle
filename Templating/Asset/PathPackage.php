@@ -33,11 +33,12 @@ class PathPackage extends BasePackage
      * @param string  $rootDir     The asset root directory
      * @param string  $summaryFile Grunt filerev summary file
      * @param string  $cacheDir    Kernel cache dir
+     * @param string  $length      The number of characters of the hash which the file is prefixed with
      * @param string  $debug       Debug?
      */
-    public function __construct(Request $request, $rootDir, $summaryFile, $cacheDir, $debug)
+    public function __construct(Request $request, $rootDir, $summaryFile, $cacheDir, $length, $debug)
     {
-        parent::__construct($rootDir, $summaryFile, $cacheDir, $debug);
+        parent::__construct($rootDir, $summaryFile, $cacheDir, $length, $debug);
 
         $basePath = $request->getBasePath();
 
@@ -45,10 +46,10 @@ class PathPackage extends BasePackage
             $this->basePath = '/';
         } else {
             if ('/' != $basePath[0]) {
-                $basePath = '/' . $basePath;
+                $basePath = '/'.$basePath;
             }
 
-            $this->basePath = rtrim($basePath, '/') . '/';
+            $this->basePath = rtrim($basePath, '/').'/';
         }
     }
 
@@ -65,13 +66,13 @@ class PathPackage extends BasePackage
         $file = $path;
         // apply the base path
         if ('/' !== substr($path, 0, 1)) {
-            $file = $this->basePath . $path;
+            $file = $this->basePath.$path;
         }
 
         $reved = $this->getRevedFilename($file);
 
-        $fullpath = $this->rootDir . $file;
-        $fullreved = $this->rootDir . $reved;
+        $fullpath = $this->rootDir.$file;
+        $fullreved = $this->rootDir.$reved;
 
         // $reved or unversioned
         if (file_exists($fullreved)) {
@@ -80,10 +81,10 @@ class PathPackage extends BasePackage
             // fallback
         } else {
             $pattern = preg_replace('/\.([^\.]+$)/', '.*.$1', $fullpath);
-            $regex = preg_replace('/\.([^\.]+$)/', '\.[\d\w]{8}\.$1', $fullpath);
+            $regex = preg_replace('/\.([^\.]+$)/', '\.[\d\w]{'.$this->length.'}\.$1', $fullpath);
             $base = str_replace($path, '', $fullpath);
             foreach (glob($pattern) as $filepath) {
-                if (preg_match('#' . $regex . '#', $filepath)) {
+                if (preg_match('#'.$regex.'#', $filepath)) {
                     $result = str_replace($base, '', $filepath);
                     $this->summary->set($file, $result);
 
