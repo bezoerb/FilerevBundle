@@ -22,6 +22,7 @@
         "psr-4" : { "Zoerb\\Bundle\\FilerevBundle\\" : "" }
     },
     "target-dir" : "Zoerb/Bundle/FilerevBundle",
+    "minimum-stability": "dev",
     "repositories" : [{
         "type": "vcs",
         "url": "https://github.com/bezoerb/FilerevBundle"
