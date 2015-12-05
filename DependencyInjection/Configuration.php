@@ -63,7 +63,7 @@ class Configuration implements ConfigurationInterface
                     ->cannotBeEmpty()
                 ->end()
                 ->scalarNode('length')->defaultValue(8)->end()
-                ->scalarNode('summary_file')->defaultValue('filerev.json')->end()
+                ->scalarNode('summary_file')->defaultValue('%kernel.root_dir%/config/filerev.json')->end()
                 ->arrayNode('assets_base_urls')
                     ->performNoDeepMerging()
                     ->addDefaultsIfNotSet()
