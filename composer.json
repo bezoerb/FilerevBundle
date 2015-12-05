@@ -21,7 +21,6 @@
     "autoload" : {
         "psr-4" : { "Zoerb\\Bundle\\FilerevBundle\\" : "" }
     },
-    "target-dir" : "Zoerb/Bundle/FilerevBundle",
     "minimum-stability": "dev",
     "repositories" : [{
         "type": "vcs",
