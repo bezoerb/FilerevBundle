@@ -26,8 +26,6 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('zoerb_filerev');
 
-        $supportedAlgorithms = array('sha1', 'md5', 'sha256', 'sha512');
-
         $organizeUrls = function ($urls) {
             $urls += array(
                 'http' => array(),
@@ -54,14 +52,6 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->scalarNode('root_dir')->defaultValue('%kernel.root_dir%/../web')->end()
-                ->scalarNode('algorithm')
-                    ->defaultValue('sha256')
-                    ->validate()
-                        ->ifNotInArray($supportedAlgorithms)
-                        ->thenInvalid('The algorithm %s is not supported. Please choose one of '.json_encode($supportedAlgorithms))
-                    ->end()
-                    ->cannotBeEmpty()
-                ->end()
                 ->scalarNode('length')->defaultValue(8)->end()
                 ->scalarNode('summary_file')->defaultValue('%kernel.root_dir%/config/filerev.json')->end()
                 ->arrayNode('assets_base_urls')

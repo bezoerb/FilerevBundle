@@ -10,7 +10,7 @@
     "license" : ["MIT"],
     "require" : {
         "php": ">=5.3.3",
-        "symfony/framework-bundle": "~2.3,<2.7",
+        "symfony/framework-bundle": ">=2.3,<2.7",
         "symfony/config": "*",
         "symfony/dependency-injection": "*",
         "symfony/http-foundation": "*",

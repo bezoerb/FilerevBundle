@@ -15,7 +15,10 @@ The summary file should look something like this:
 
 ## Installation
 #### Step 1: Download
-more to come
+
+```bash
+composer require zoerb/filerevbundle
+```
 
 #### Step 2: Enable the bundle
 Finally, enable the bundle in the kernel:
