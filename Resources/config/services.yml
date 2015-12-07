@@ -1,11 +1,5 @@
 services:
-  zoerb_filerev.templating.asset.path_package:
+  zoerb_filerev.assets.json_version_strategy:
     abstract: true
-    class: Zoerb\Bundle\FilerevBundle\Templating\Asset\PathPackage
-    arguments: [@request,"","","","",""]
-    scope: request
-
-  zoerb_filerev.templating.asset.url_package:
-    abstract: true
-    class: Zoerb\Bundle\FilerevBundle\Templating\Asset\UrlPackage
-    arguments: ["","","","","",""]
+    class: Zoerb\Bundle\FilerevBundle\Asset\VersionStrategy\JsonVersionStrategy
+    arguments: ["","","","",""]

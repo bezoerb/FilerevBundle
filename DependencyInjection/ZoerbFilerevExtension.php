@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -40,107 +41,70 @@ class ZoerbFilerevExtension extends Extension implements PrependExtensionInterfa
             return;
         }
 
-        $defaultPackage = $this->createPackageDefinition($container, $config);
+        $defaultVersion = $this->createVersion($container, $config, '_default');
+        $defaultPackage = $this->createPackageDefinition($config['base_path'], $config['base_urls'], $defaultVersion);
 
-
-        // overwrite symfony default package
-        $container->setDefinition('templating.asset.default_package', $defaultPackage);
-
+        $container->setDefinition('assets._default_package', $defaultPackage);
     }
+
 
     /**
      * Returns a definition for an asset package.
-     *
-     * @param ContainerBuilder $container Container
-     * @param array            $config    bundle config
-     * @param string           $name      Package name
-     *
-     * @return DefinitionDecorator
      */
-    private function createPackageDefinition(ContainerBuilder $container, array $config, $name = null)
+    private function createPackageDefinition($basePath, array $baseUrls, Reference $version)
     {
+        if ($basePath && $baseUrls) {
+            throw new \LogicException('An asset package cannot have base URLs and base paths.');
+        }
 
-        // assets_base_urls are cloned from framework configuration in `prepend`
-        $httpUrls = $config['assets_base_urls']['http'];
-        $sslUrls = $config['assets_base_urls']['ssl'];
-        $rootDir = $config['root_dir'];
-        $length = $config['length'];
-        $summaryFile = $config['summary_file'];
-        $debug = $config['debug'];
-        $cacheDir = $container->getParameter('kernel.cache_dir').'/zoerb_filerev';
+        if (!$baseUrls) {
+            $package = new DefinitionDecorator('assets.path_package');
 
-
-        if (!$httpUrls) {
-            $package = new DefinitionDecorator('zoerb_filerev.templating.asset.path_package');
-            $package
+            return $package
                 ->setPublic(false)
-                ->setScope('request')
-                ->replaceArgument(1, $rootDir)
-                ->replaceArgument(2, $summaryFile)
-                ->replaceArgument(3, $cacheDir)
-                ->replaceArgument(4, $length)
-                ->replaceArgument(5, $debug);
-
-            return $package;
+                ->replaceArgument(0, $basePath)
+                ->replaceArgument(1, $version)
+                ;
         }
 
-        if ($httpUrls == $sslUrls) {
-            $package = new DefinitionDecorator('zoerb_filerev.templating.asset.url_package');
+        $package = new DefinitionDecorator('assets.url_package');
 
-            $package
-                ->setPublic(false)
-                ->replaceArgument(0, $sslUrls)
-                ->replaceArgument(1, $rootDir)
-                ->replaceArgument(2, $summaryFile)
-                ->replaceArgument(3, $cacheDir)
-                ->replaceArgument(4, $length)
-                ->replaceArgument(5, $debug);
-
-            return $package;
-        }
-
-        $prefix = $name ? 'templating.asset.package.'.$name : 'templating.asset.default_package';
-
-        $httpPackage = new DefinitionDecorator('zoerb_filerev.templating.asset.url_package');
-        $httpPackage
-            ->replaceArgument(0, $httpUrls)
-            ->replaceArgument(1, $rootDir)
-            ->replaceArgument(2, $summaryFile)
-            ->replaceArgument(3, $cacheDir)
-            ->replaceArgument(4, $length)
-            ->replaceArgument(5, $debug);
-        $container->setDefinition($prefix.'.http', $httpPackage);
-
-        if ($sslUrls) {
-            $sslPackage = new DefinitionDecorator('zoerb_filerev.templating.asset.url_package');
-            $sslPackage
-                ->replaceArgument(0, $sslUrls)
-                ->replaceArgument(1, $rootDir)
-                ->replaceArgument(2, $summaryFile)
-                ->replaceArgument(3, $cacheDir)
-                ->replaceArgument(4, $length)
-                ->replaceArgument(5, $debug);
-        } else {
-            $sslPackage = new DefinitionDecorator('zoerb_filerev.templating.asset.path_package');
-            $sslPackage
-                ->setScope('request')
-                ->replaceArgument(1, $rootDir)
-                ->replaceArgument(2, $summaryFile)
-                ->replaceArgument(3, $cacheDir)
-                ->replaceArgument(4, $length)
-                ->replaceArgument(5, $debug);
-        }
-        $container->setDefinition($prefix.'.ssl', $sslPackage);
-
-
-        $package = new DefinitionDecorator('templating.asset.request_aware_package');
-        $package
+        return $package
             ->setPublic(false)
-            ->setScope('request')
-            ->replaceArgument(1, $prefix.'.http')
-            ->replaceArgument(2, $prefix.'.ssl');
+            ->replaceArgument(0, $baseUrls)
+            ->replaceArgument(1, $version)
+            ;
+    }
 
-        return $package;
+    /**
+     * Returns version strategy reference
+     *
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @param                  $name
+     *
+     * @return Reference
+     */
+    private function createVersion(ContainerBuilder $container, array $config, $name)
+    {
+        // $rootDir, $summaryFile, $hashLength, $cacheDir, $debug)
+        $rootDir = $config['root_dir'];
+        $summaryFile = $config['summary_file'];
+        $hashLength = $config['length'];
+        $cacheDir = $container->getParameter('kernel.cache_dir').'/zoerb_filerev';
+        $debug = $config['debug'];
+
+        $def = new DefinitionDecorator('zoerb_filerev.assets.json_version_strategy');
+        $def
+            ->replaceArgument(0, $rootDir)
+            ->replaceArgument(1, $summaryFile)
+            ->replaceArgument(2, $hashLength)
+            ->replaceArgument(3, $cacheDir)
+            ->replaceArgument(4, $debug)
+        ;
+        $container->setDefinition('assets._version_'.$name, $def);
+
+        return new Reference('assets._version_'.$name);
     }
 
     /**
@@ -156,11 +120,18 @@ class ZoerbFilerevExtension extends Extension implements PrependExtensionInterfa
         // use the FrameworkConfiguration class to generate a config
         $config = $this->processConfiguration(new FrameworkConfiguration(false), $configs);
 
-        // check if assets_base_urls is set in the "templating" configuration
-        if (isset($config['templating']) && isset($config['templating']['assets_base_urls'])) {
-            // prepend the acme_something settings with the entity_manager_name
-            $innerConfig = array('assets_base_urls' => $config['templating']['assets_base_urls']);
-            $container->prependExtensionConfig($this->getAlias(), $innerConfig);
+        if (isset($config['assets'])) {
+            $frameworkConfig = array();
+
+            if (isset($config['assets']['base_urls'])) {
+                $frameworkConfig['base_urls'] = $config['assets']['base_urls'];
+            }
+
+            if (isset($config['assets']['base_path'])) {
+                $frameworkConfig['base_path'] = $config['assets']['base_path'];
+            }
+
+            $container->prependExtensionConfig($this->getAlias(), $frameworkConfig);
         }
     }
 }

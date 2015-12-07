@@ -1,77 +1,60 @@
 <?php
-
 /**
  * Copyright (c) 2015 Ben Zörb
  * Licensed under the MIT license.
  * http://bezoerb.mit-license.org/
  */
 
-namespace Zoerb\Bundle\FilerevBundle\Templating\Asset;
+namespace Zoerb\Bundle\FilerevBundle\Asset\VersionStrategy;
 
+use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Templating\Asset\Package;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Translation\Loader\JsonFileLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 
 /**
- * The path packages adds a version and a base path to asset URLs for use with node's filerev .
+ * Returns the Version based on json configuration
  *
- * @author Ben Zörb <ben@sommerlaune.com>
+ * @package Zoerb\Bundle\FilerevBundle\Asset\VersionStrategy
  */
-class BasePackage extends Package
+class JsonVersionStrategy implements VersionStrategyInterface
 {
 
-    /**
-     * Service container
-     *
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var MessageCatalogue
-     */
+    /** @var MessageCatalogue */
     protected $summary;
 
-    /**
-     * Asset root dir
-     *
-     * @var string
-     */
+    /** @var string */
+    protected $cacheDir;
+
+    /** @var string */
+    protected $summaryFile;
+
+    /** @var string */
     protected $rootDir;
 
-    /**
-     * The number of characters of the hash which the file is prefixed with
-     *
-     * @var string
-     */
-    protected $length;
+    /** @var int */
+    protected $hashLength;
+
+    /** @var bool */
+    protected $debug;
 
 
     /**
-     * Constructor.
-     *
-     * @param string $rootDir     The asset root directory
-     * @param string $summaryFile Grunt filerev summary file
-     * @param string $cacheDir    Kernel cache dir
-     * @param string $length      The number of characters of the hash which the file is prefixed with
-     * @param bool   $debug       Debug
+     * @param string $rootDir
+     * @param string $summaryFile
+     * @param int $hashLength
+     * @param string $cacheDir
+     * @param bool $debug
      */
-    public function __construct($rootDir, $summaryFile, $cacheDir, $length, $debug)
+    public function __construct($rootDir, $summaryFile, $hashLength, $cacheDir, $debug)
     {
-        parent::__construct();
-
         $this->rootDir = $rootDir;
         $this->summaryFile = $summaryFile;
+        $this->hashLength = $hashLength;
         $this->cacheDir = $cacheDir;
-        $this->$length = $length;
         $this->debug = $debug;
-
-        $this->initializeCacheCatalogue();
     }
-
 
     /**
      * Get filerev summary
@@ -179,5 +162,68 @@ EOF
     protected function getCatalogueCachePath($cacheDir)
     {
         return $cacheDir.'/filerev.summary.php';
+    }
+
+    /**
+     * Returns the asset version for an asset.
+     *
+     * @param string $path A path
+     *
+     * @return string The version string
+     */
+    public function getVersion($path)
+    {
+        $versionized = $this->applyVersion($path);
+        $regex = preg_replace('/\.([^\.]+$)/', '\.[\d\w]{'.$this->hashLength.'}\.$1', $versionized);
+
+        if (preg_match('#'.$regex.'#', $versionized, $match)) {
+            return $match[1];
+        }
+
+        return '';
+    }
+
+    /**
+     * Applies version to the supplied path.
+     *
+     * @param string $path A path
+     *
+     * @return string The versionized path
+     */
+    public function applyVersion($path)
+    {
+        $file = $path;
+        // apply the base path
+        if ('/' !== substr($path, 0, 1)) {
+            $file = '/'.$path;
+        }
+
+        $reved = $this->getRevedFilename($file);
+
+        $absPath = $this->rootDir.$file;
+        $absReved = $this->rootDir.$reved;
+
+
+        // $reved or unversioned
+        if (file_exists($absReved)) {
+            return $reved;
+
+            // look in filesystem
+        } else {
+            $pattern = preg_replace('/\.([^\.]+$)/', '.*.$1', $absPath);
+            $regex = preg_replace('/\.([^\.]+$)/', '\.[\d\w]{'.$this->hashLength.'}\.$1', $absPath);
+            $base = str_replace($path, '', $absPath);
+            foreach (glob($pattern) as $filepath) {
+                if (preg_match('#'.$regex.'#', $filepath, $match)) {
+                    $result = str_replace($base, '', $filepath);
+                    $this->summary->set($file, $result);
+
+                    return $filepath;
+                }
+            };
+
+        }
+
+        return $path;
     }
 }

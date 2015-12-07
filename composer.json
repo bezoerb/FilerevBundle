@@ -9,14 +9,8 @@
     "keywords" : ["library","asset","filerev","cachebusting"],
     "license" : ["MIT"],
     "require" : {
-        "php": ">=5.3.3",
-        "symfony/framework-bundle": ">=2.3,<2.7",
-        "symfony/config": "*",
-        "symfony/dependency-injection": "*",
-        "symfony/http-foundation": "*",
-        "symfony/http-kernel": "*",
-        "symfony/templating": "*",
-        "symfony/translation": "*"
+        "php": ">=5.3.9",
+        "symfony/framework-bundle": ">=2.7"
     },
     "autoload" : {
         "psr-4" : { "Zoerb\\Bundle\\FilerevBundle\\" : "" }
