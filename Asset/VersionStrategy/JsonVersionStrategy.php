@@ -149,7 +149,7 @@ EOF
             return;
         }
 
-        $this->summary = include $cache;
+        $this->summary = include $cache->getPath();
     }
 
     /**
