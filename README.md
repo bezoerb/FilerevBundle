@@ -31,7 +31,7 @@ public function registerBundles()
 {
     $bundles = array(
         // ...
-        new Zoerb\Bundle\ZoerbFilerevBundle(),
+        new Zoerb\Bundle\FilerevBundle\ZoerbFilerevBundle(),
     );
 }
 ```
