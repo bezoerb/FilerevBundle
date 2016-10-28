@@ -215,7 +215,7 @@ EOF
                     $result = str_replace($base, '', $filepath);
                     $this->summary->set($path, $result);
 
-                    return $filepath;
+                    return $result;
                 }
             };
 
