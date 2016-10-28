@@ -2,4 +2,4 @@ services:
   zoerb_filerev.assets.json_version_strategy:
     abstract: true
     class: Zoerb\Bundle\FilerevBundle\Asset\VersionStrategy\JsonVersionStrategy
-    arguments: ["","","","",""]
+    arguments: ["","","","","",""]

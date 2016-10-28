@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright (c) 2015 Ben Zörb
+ * Copyright (c) 2016 Ben Zörb
  * Licensed under the MIT license.
  * http://bezoerb.mit-license.org/
  */
@@ -90,6 +89,7 @@ class ZoerbFilerevExtension extends Extension implements PrependExtensionInterfa
         // $rootDir, $summaryFile, $hashLength, $cacheDir, $debug)
         $rootDir = $config['root_dir'];
         $summaryFile = $config['summary_file'];
+        $separator = $config['separator'];
         $hashLength = $config['length'];
         $cacheDir = $container->getParameter('kernel.cache_dir').'/zoerb_filerev';
         $debug = $config['debug'];
@@ -99,8 +99,9 @@ class ZoerbFilerevExtension extends Extension implements PrependExtensionInterfa
             ->replaceArgument(0, $rootDir)
             ->replaceArgument(1, $summaryFile)
             ->replaceArgument(2, $hashLength)
-            ->replaceArgument(3, $cacheDir)
-            ->replaceArgument(4, $debug)
+            ->replaceArgument(3, $separator)
+            ->replaceArgument(4, $cacheDir)
+            ->replaceArgument(5, $debug)
         ;
         $container->setDefinition('assets._version_'.$name, $def);
 

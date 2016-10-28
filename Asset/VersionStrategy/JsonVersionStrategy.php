@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2015 Ben Zörb
+ * Copyright (c) 2016 Ben Zörb
  * Licensed under the MIT license.
  * http://bezoerb.mit-license.org/
  */
@@ -36,6 +36,9 @@ class JsonVersionStrategy implements VersionStrategyInterface
     /** @var int */
     protected $hashLength;
 
+    /** @var string */
+    protected $separator;
+
     /** @var bool */
     protected $debug;
 
@@ -47,11 +50,12 @@ class JsonVersionStrategy implements VersionStrategyInterface
      * @param string $cacheDir
      * @param bool $debug
      */
-    public function __construct($rootDir, $summaryFile, $hashLength, $cacheDir, $debug)
+    public function __construct($rootDir, $summaryFile, $hashLength, $separator, $cacheDir, $debug)
     {
         $this->rootDir = $rootDir;
         $this->summaryFile = $summaryFile;
         $this->hashLength = $hashLength;
+        $this->separator = $separator;
         $this->cacheDir = $cacheDir;
         $this->debug = $debug;
     }
@@ -192,17 +196,10 @@ EOF
      */
     public function applyVersion($path)
     {
-        $file = $path;
-        // apply the base path
-        if ('/' !== substr($path, 0, 1)) {
-            $file = '/'.$path;
-        }
+        $reved = $this->getRevedFilename($path);
 
-        $reved = $this->getRevedFilename($file);
-
-        $absPath = $this->rootDir.$file;
-        $absReved = $this->rootDir.$reved;
-
+        $absPath = implode(DIRECTORY_SEPARATOR, [$this->rootDir,$path]);
+        $absReved = implode(DIRECTORY_SEPARATOR, [$this->rootDir,$reved]);
 
         // $reved or unversioned
         if (file_exists($absReved)) {
@@ -210,13 +207,13 @@ EOF
 
             // look in filesystem
         } else {
-            $pattern = preg_replace('/\.([^\.]+$)/', '.*.$1', $absPath);
-            $regex = preg_replace('/\.([^\.]+$)/', '\.[\d\w]{'.$this->hashLength.'}\.$1', $absPath);
+            $pattern = preg_replace('/\.([^\.]+$)/', $this->separator.'*.$1', $absPath);
+            $regex = preg_replace('/\.([^\.]+$)/', '\\'.$this->separator.'[\d\w]{'.$this->hashLength.'}\.$1', $absPath);
             $base = str_replace($path, '', $absPath);
             foreach (glob($pattern) as $filepath) {
                 if (preg_match('#'.$regex.'#', $filepath, $match)) {
                     $result = str_replace($base, '', $filepath);
-                    $this->summary->set($file, $result);
+                    $this->summary->set($path, $result);
 
                     return $filepath;
                 }

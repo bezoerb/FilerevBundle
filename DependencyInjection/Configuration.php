@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright (c) 2015 Ben Zörb
+ * Copyright (c) 2016 Ben Zörb
  * Licensed under the MIT license.
  * http://bezoerb.mit-license.org/
  */
@@ -53,7 +52,8 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->scalarNode('root_dir')->defaultValue('%kernel.root_dir%/../web')->end()
                 ->scalarNode('length')->defaultValue(8)->end()
-                ->scalarNode('summary_file')->defaultValue('%kernel.root_dir%/config/filerev.json')->end()
+                ->scalarNode('separator')->defaultValue('.')->end()
+                ->scalarNode('summary_file')->defaultValue('%kernel.root_dir%/config/rev-manifest.json')->end()
                 ->scalarNode('base_path')->end()
                 ->arrayNode('base_urls')
                     ->beforeNormalization()

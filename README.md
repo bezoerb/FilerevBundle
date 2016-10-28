@@ -45,7 +45,7 @@ Add the following configuration to your `app/config/config.yml`:
 
 ##### summary_file
 Type: `string`
-Default value: `'%kernel.root_dir%/config/filerev.json'`
+Default value: `'%kernel.root_dir%/config/rev-manifest.json'`
 
 Points to the rev summary file
 
@@ -68,6 +68,13 @@ Type: `int`
 Default: `8`
 
 The number of characters of the file hash.
+
+##### separator
+
+Type: `string`
+Default: `.`
+
+The character which separates filename and hash. 
 
 
 ## Changelog
