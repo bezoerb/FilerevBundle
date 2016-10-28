@@ -1,4 +1,11 @@
 
+v1.1.0 / 2016-10-28
+==================
+
+  * Minor improvements
+  * Merge pull request #2 from BartVB/patch-1
+  * Incorrect AppKernel.php Bundle
+
 v1.0.2 / 2016-09-29
 ===================
 
